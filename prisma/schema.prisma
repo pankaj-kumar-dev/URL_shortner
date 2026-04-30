@@ -7,11 +7,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  urls      Url[]
+}
+
 model Url {
   id          Int      @id @default(autoincrement())
   originalUrl String
   shortCode   String   @unique
   createdAt   DateTime @default(now())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
   clicks      Click[]
 
   @@index([shortCode])

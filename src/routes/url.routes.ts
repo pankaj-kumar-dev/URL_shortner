@@ -5,13 +5,14 @@ import redis from '../lib/redis';
 import { rateLimiter } from '../lib/rateLimiter';
 import { validateUrl } from '../lib/urlValidator';
 import analyticsQueue from '../lib/queue';
+import { authMiddleware, AuthRequest } from '../middleware/auth';
 
 const router = Router();
 
 const CACHE_TTL_SECONDS = 60 * 60 * 24; // 24 hours
 
-// POST /shorten — rate limited + malicious URL check
-router.post('/shorten', rateLimiter, async (req: Request, res: Response) => {
+// POST /shorten — rate limited + auth + malicious URL check
+router.post('/shorten', rateLimiter, authMiddleware, async (req: AuthRequest, res: Response) => {
   const { url } = req.body as { url?: string };
 
   if (!url || typeof url !== 'string') {
@@ -28,7 +29,7 @@ router.post('/shorten', rateLimiter, async (req: Request, res: Response) => {
 
   try {
     const record = await prisma.url.create({
-      data: { originalUrl: url, shortCode: '' },
+      data: { originalUrl: url, shortCode: '', userId: req.userId! },
     });
 
     const shortCode = encodeBase62(record.id);
@@ -47,6 +48,52 @@ router.post('/shorten', rateLimiter, async (req: Request, res: Response) => {
     });
   } catch (err) {
     console.error('[POST /shorten]', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /:code/stats — auth required, returns click analytics
+router.get('/:code/stats', authMiddleware, async (req: AuthRequest, res: Response) => {
+  const { code } = req.params;
+
+  try {
+    const record = await prisma.url.findUnique({
+      where: { shortCode: code },
+      include: { clicks: true },
+    });
+
+    if (!record) {
+      res.status(404).json({ error: 'Short URL not found' });
+      return;
+    }
+
+    if (record.userId !== req.userId) {
+      res.status(403).json({ error: 'Forbidden' });
+      return;
+    }
+
+    const totalClicks = record.clicks.length;
+
+    const uniqueIPs = new Set(record.clicks.map((c) => c.ip)).size;
+
+    const uaCounts: Record<string, number> = {};
+    for (const click of record.clicks) {
+      uaCounts[click.userAgent] = (uaCounts[click.userAgent] ?? 0) + 1;
+    }
+    const topUserAgents = Object.entries(uaCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([userAgent, count]) => ({ userAgent, count }));
+
+    res.json({
+      shortCode: code,
+      originalUrl: record.originalUrl,
+      totalClicks,
+      uniqueIPs,
+      topUserAgents,
+    });
+  } catch (err) {
+    console.error('[GET /:code/stats]', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
