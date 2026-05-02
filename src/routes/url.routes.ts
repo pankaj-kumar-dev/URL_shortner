@@ -13,22 +13,22 @@ const CACHE_TTL_SECONDS = 60 * 60 * 24; // 24h
 
 interface CacheEntry {
   url: string;
+  urlId: number;
   expiresAt: string | null;
 }
 
-function buildCacheEntry(url: string, expiresAt: Date | null): string {
-  return JSON.stringify({ url, expiresAt: expiresAt?.toISOString() ?? null });
+function buildCacheEntry(url: string, urlId: number, expiresAt: Date | null): string {
+  return JSON.stringify({ url, urlId, expiresAt: expiresAt?.toISOString() ?? null });
 }
 
-function parseCacheEntry(raw: string): CacheEntry {
+function parseCacheEntry(raw: string): CacheEntry | null {
   try {
     const parsed = JSON.parse(raw) as unknown;
-    if (parsed && typeof parsed === 'object' && 'url' in parsed) {
+    if (parsed && typeof parsed === 'object' && 'url' in parsed && 'urlId' in parsed) {
       return parsed as CacheEntry;
     }
   } catch {}
-  // Legacy plain-string entry — no expiry
-  return { url: raw, expiresAt: null };
+  return null;
 }
 
 function cacheTTL(expiresAt: Date | null): number {
@@ -37,7 +37,7 @@ function cacheTTL(expiresAt: Date | null): number {
   return Math.min(CACHE_TTL_SECONDS, remaining);
 }
 
-// POST /shorten — rate limited + auth + malicious URL check
+// POST /shorten
 router.post('/shorten', rateLimiter, authMiddleware, async (req: AuthRequest, res: Response) => {
   const { url, ttlSeconds } = req.body as { url?: string; ttlSeconds?: unknown };
 
@@ -73,11 +73,12 @@ router.post('/shorten', rateLimiter, authMiddleware, async (req: AuthRequest, re
     });
 
     const ttl = cacheTTL(updated.expiresAt);
-    await redis.set(`url:${shortCode}`, buildCacheEntry(updated.originalUrl, updated.expiresAt), 'EX', ttl);
+    const cv = buildCacheEntry(updated.originalUrl, updated.id, updated.expiresAt);
+    await redis.set('url:' + shortCode, cv, 'EX', ttl);
 
     res.status(201).json({
       shortCode: updated.shortCode,
-      shortUrl: `${req.protocol}://${req.get('host')}/${updated.shortCode}`,
+      shortUrl: req.protocol + '://' + req.get('host') + '/' + updated.shortCode,
       originalUrl: updated.originalUrl,
       expiresAt: updated.expiresAt ?? null,
     });
@@ -87,7 +88,7 @@ router.post('/shorten', rateLimiter, authMiddleware, async (req: AuthRequest, re
   }
 });
 
-// GET /my/urls — paginated list of caller's URLs with click counts
+// GET /my/urls
 router.get('/my/urls', authMiddleware, async (req: AuthRequest, res: Response) => {
   const rawLimit = parseInt(req.query.limit as string, 10);
   const limit = Number.isFinite(rawLimit) && rawLimit > 0 ? Math.min(rawLimit, 50) : 10;
@@ -115,13 +116,13 @@ router.get('/my/urls', authMiddleware, async (req: AuthRequest, res: Response) =
     const hasMore = rows.length > limit;
     const page = hasMore ? rows.slice(0, limit) : rows;
     const nextCursor = hasMore ? page[page.length - 1].id : null;
-    const host = `${req.protocol}://${req.get('host')}`;
+    const host = req.protocol + '://' + req.get('host');
 
     res.json({
       urls: page.map((r) => ({
         id: r.id,
         shortCode: r.shortCode,
-        shortUrl: `${host}/${r.shortCode}`,
+        shortUrl: host + '/' + r.shortCode,
         originalUrl: r.originalUrl,
         createdAt: r.createdAt,
         expiresAt: r.expiresAt ?? null,
@@ -136,14 +137,14 @@ router.get('/my/urls', authMiddleware, async (req: AuthRequest, res: Response) =
   }
 });
 
-// GET /:code/stats — auth required, ownership-gated
+// GET /:code/stats
 router.get('/:code/stats', authMiddleware, async (req: AuthRequest, res: Response) => {
   const { code } = req.params;
 
   try {
     const record = await prisma.url.findUnique({
       where: { shortCode: code },
-      include: { clicks: true },
+      select: { id: true, userId: true, originalUrl: true, expiresAt: true },
     });
 
     if (!record) {
@@ -156,25 +157,32 @@ router.get('/:code/stats', authMiddleware, async (req: AuthRequest, res: Respons
       return;
     }
 
-    const totalClicks = record.clicks.length;
-    const uniqueIPs = new Set(record.clicks.map((c) => c.ip)).size;
-
-    const uaCounts: Record<string, number> = {};
-    for (const click of record.clicks) {
-      uaCounts[click.userAgent] = (uaCounts[click.userAgent] ?? 0) + 1;
-    }
-    const topUserAgents = Object.entries(uaCounts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3)
-      .map(([userAgent, count]) => ({ userAgent, count }));
+    const [totalClicks, uniqueIPRows, topUserAgents] = await Promise.all([
+      prisma.click.count({ where: { urlId: record.id } }),
+      prisma.click.findMany({
+        where: { urlId: record.id },
+        distinct: ['ip'],
+        select: { ip: true },
+      }),
+      prisma.click.groupBy({
+        by: ['userAgent'],
+        where: { urlId: record.id },
+        _count: { userAgent: true },
+        orderBy: { _count: { userAgent: 'desc' } },
+        take: 3,
+      }),
+    ]);
 
     res.json({
       shortCode: code,
       originalUrl: record.originalUrl,
       expiresAt: record.expiresAt ?? null,
       totalClicks,
-      uniqueIPs,
-      topUserAgents,
+      uniqueIPs: uniqueIPRows.length,
+      topUserAgents: topUserAgents.map((r) => ({
+        userAgent: r.userAgent,
+        count: r._count.userAgent,
+      })),
     });
   } catch (err) {
     console.error('[GET /:code/stats]', err);
@@ -182,23 +190,29 @@ router.get('/:code/stats', authMiddleware, async (req: AuthRequest, res: Respons
   }
 });
 
-// GET /:code — Redis-first redirect, expiry-aware
+// GET /:code — Redis-first redirect
 router.get('/:code', async (req: Request, res: Response) => {
   const { code } = req.params;
-  const cacheKey = `url:${code}`;
+  const cacheKey = 'url:' + code;
 
   try {
     const raw = await redis.get(cacheKey);
     if (raw) {
       const entry = parseCacheEntry(raw);
-      if (entry.expiresAt && new Date(entry.expiresAt) <= new Date()) {
-        await redis.del(cacheKey);
-        res.status(410).json({ error: 'This link has expired' });
+      if (entry) {
+        if (entry.expiresAt && new Date(entry.expiresAt) <= new Date()) {
+          await redis.del(cacheKey);
+          res.status(410).json({ error: 'This link has expired' });
+          return;
+        }
+        analyticsQueue.add('click', {
+          urlId: entry.urlId,
+          ip: req.ip ?? 'unknown',
+          userAgent: req.headers['user-agent'] ?? 'unknown',
+        }).catch(() => {});
+        res.redirect(301, entry.url);
         return;
       }
-      enqueueClick(code, req).catch(() => {});
-      res.redirect(301, entry.url);
-      return;
     }
 
     const record = await prisma.url.findUnique({ where: { shortCode: code } });
@@ -214,7 +228,8 @@ router.get('/:code', async (req: Request, res: Response) => {
     }
 
     const ttl = cacheTTL(record.expiresAt);
-    await redis.set(cacheKey, buildCacheEntry(record.originalUrl, record.expiresAt), 'EX', ttl);
+    const cv2 = buildCacheEntry(record.originalUrl, record.id, record.expiresAt);
+    await redis.set(cacheKey, cv2, 'EX', ttl);
 
     analyticsQueue.add('click', {
       urlId: record.id,
@@ -228,18 +243,5 @@ router.get('/:code', async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
-async function enqueueClick(code: string, req: Request): Promise<void> {
-  const record = await prisma.url.findUnique({
-    where: { shortCode: code },
-    select: { id: true },
-  });
-  if (!record) return;
-  await analyticsQueue.add('click', {
-    urlId: record.id,
-    ip: req.ip ?? 'unknown',
-    userAgent: req.headers['user-agent'] ?? 'unknown',
-  });
-}
 
 export default router;
