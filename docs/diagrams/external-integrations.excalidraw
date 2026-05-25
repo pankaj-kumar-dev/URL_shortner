@@ -1,0 +1,11 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "https://excalidraw.com",
+  "elements": [
+    {"id":"ext-title","type":"text","x":40,"y":30,"width":420,"height":35,"angle":0,"strokeColor":"#111111","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"groupIds":[],"frameId":null,"roundness":null,"seed":801,"version":1,"versionNonce":801,"isDeleted":false,"boundElements":null,"updated":1,"link":null,"locked":false,"text":"External Integrations","fontSize":28,"fontFamily":1,"textAlign":"left","verticalAlign":"top","containerId":null,"originalText":"External Integrations","lineHeight":1.25,"baseline":28},
+    {"id":"ext-flow","type":"text","x":60,"y":100,"width":760,"height":210,"angle":0,"strokeColor":"#111111","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"groupIds":[],"frameId":null,"roundness":null,"seed":802,"version":1,"versionNonce":802,"isDeleted":false,"boundElements":null,"updated":1,"link":null,"locked":false,"text":"External runtime dependencies\n  PostgreSQL: primary datastore\n  Redis: cache, rate limiter, BullMQ backend\n\nNo external APIs in code\n  URL validation is local heuristics only\n  No email provider\n  No analytics SaaS\n  No object storage\n  No payment provider","fontSize":22,"fontFamily":1,"textAlign":"left","verticalAlign":"top","containerId":null,"originalText":"External runtime dependencies\n  PostgreSQL: primary datastore\n  Redis: cache, rate limiter, BullMQ backend\n\nNo external APIs in code\n  URL validation is local heuristics only\n  No email provider\n  No analytics SaaS\n  No object storage\n  No payment provider","lineHeight":1.25,"baseline":210}
+  ],
+  "appState": {"gridSize": null, "viewBackgroundColor": "#ffffff"},
+  "files": {}
+}

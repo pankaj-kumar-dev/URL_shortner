@@ -1,0 +1,11 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "https://excalidraw.com",
+  "elements": [
+    {"id":"q-title","type":"text","x":40,"y":30,"width":360,"height":35,"angle":0,"strokeColor":"#111111","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"groupIds":[],"frameId":null,"roundness":null,"seed":501,"version":1,"versionNonce":501,"isDeleted":false,"boundElements":null,"updated":1,"link":null,"locked":false,"text":"Queue Topology","fontSize":28,"fontFamily":1,"textAlign":"left","verticalAlign":"top","containerId":null,"originalText":"Queue Topology","lineHeight":1.25,"baseline":28},
+    {"id":"q-flow","type":"text","x":60,"y":100,"width":760,"height":220,"angle":0,"strokeColor":"#111111","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"groupIds":[],"frameId":null,"roundness":null,"seed":502,"version":1,"versionNonce":502,"isDeleted":false,"boundElements":null,"updated":1,"link":null,"locked":false,"text":"Express route imports analyticsQueue\n  -> queue.ts constructs Queue('analytics')\n  -> queue.ts also constructs Worker('analytics')\n  -> Redis stores queue state\n  -> Worker writes Click rows\n\nProduction note:\n  web process and worker lifecycle are currently coupled","fontSize":22,"fontFamily":1,"textAlign":"left","verticalAlign":"top","containerId":null,"originalText":"Express route imports analyticsQueue\n  -> queue.ts constructs Queue('analytics')\n  -> queue.ts also constructs Worker('analytics')\n  -> Redis stores queue state\n  -> Worker writes Click rows\n\nProduction note:\n  web process and worker lifecycle are currently coupled","lineHeight":1.25,"baseline":220}
+  ],
+  "appState": {"gridSize": null, "viewBackgroundColor": "#ffffff"},
+  "files": {}
+}

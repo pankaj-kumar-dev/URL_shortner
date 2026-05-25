@@ -1,0 +1,11 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "https://excalidraw.com",
+  "elements": [
+    {"id":"aj-title","type":"text","x":40,"y":30,"width":360,"height":35,"angle":0,"strokeColor":"#111111","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"groupIds":[],"frameId":null,"roundness":null,"seed":401,"version":1,"versionNonce":401,"isDeleted":false,"boundElements":null,"updated":1,"link":null,"locked":false,"text":"Async Jobs","fontSize":28,"fontFamily":1,"textAlign":"left","verticalAlign":"top","containerId":null,"originalText":"Async Jobs","lineHeight":1.25,"baseline":28},
+    {"id":"aj-flow","type":"text","x":60,"y":100,"width":760,"height":210,"angle":0,"strokeColor":"#111111","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"groupIds":[],"frameId":null,"roundness":null,"seed":402,"version":1,"versionNonce":402,"isDeleted":false,"boundElements":null,"updated":1,"link":null,"locked":false,"text":"GET /:code redirect\n  -> prepare ClickJobData { urlId, ip, userAgent }\n  -> analyticsQueue.add('click')\n  -> redirect immediately\n\nBullMQ Worker\n  -> receives click job\n  -> prisma.click.create\n  -> retries failed jobs 3x with exponential backoff","fontSize":22,"fontFamily":1,"textAlign":"left","verticalAlign":"top","containerId":null,"originalText":"GET /:code redirect\n  -> prepare ClickJobData { urlId, ip, userAgent }\n  -> analyticsQueue.add('click')\n  -> redirect immediately\n\nBullMQ Worker\n  -> receives click job\n  -> prisma.click.create\n  -> retries failed jobs 3x with exponential backoff","lineHeight":1.25,"baseline":210}
+  ],
+  "appState": {"gridSize": null, "viewBackgroundColor": "#ffffff"},
+  "files": {}
+}

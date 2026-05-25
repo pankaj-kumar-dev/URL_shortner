@@ -2,8 +2,12 @@ node_modules/
 dist/
 .env
 .claude/
-
+.ai/
+.interview-prep/
 # Redis
 redis-bin/
 dump.rdb
 *.zip
+# Interview prep docs
+interview-prep/
+.INTERVIEW-GUIDE.md

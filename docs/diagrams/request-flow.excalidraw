@@ -1,0 +1,11 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "https://excalidraw.com",
+  "elements": [
+    {"id":"rf-title","type":"text","x":40,"y":30,"width":360,"height":35,"angle":0,"strokeColor":"#111111","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"groupIds":[],"frameId":null,"roundness":null,"seed":201,"version":1,"versionNonce":201,"isDeleted":false,"boundElements":null,"updated":1,"link":null,"locked":false,"text":"Request Flow","fontSize":28,"fontFamily":1,"textAlign":"left","verticalAlign":"top","containerId":null,"originalText":"Request Flow","lineHeight":1.25,"baseline":28},
+    {"id":"rf-flow","type":"text","x":60,"y":100,"width":760,"height":230,"angle":0,"strokeColor":"#111111","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"groupIds":[],"frameId":null,"roundness":null,"seed":202,"version":1,"versionNonce":202,"isDeleted":false,"boundElements":null,"updated":1,"link":null,"locked":false,"text":"POST /shorten\n  -> Redis sliding-window rate limiter\n  -> JWT auth middleware\n  -> URL validator\n  -> Prisma create Url with empty shortCode\n  -> Base62(id)\n  -> Prisma update shortCode\n  -> Redis set url:{code}\n  -> 201 response","fontSize":22,"fontFamily":1,"textAlign":"left","verticalAlign":"top","containerId":null,"originalText":"POST /shorten\n  -> Redis sliding-window rate limiter\n  -> JWT auth middleware\n  -> URL validator\n  -> Prisma create Url with empty shortCode\n  -> Base62(id)\n  -> Prisma update shortCode\n  -> Redis set url:{code}\n  -> 201 response","lineHeight":1.25,"baseline":230}
+  ],
+  "appState": {"gridSize": null, "viewBackgroundColor": "#ffffff"},
+  "files": {}
+}

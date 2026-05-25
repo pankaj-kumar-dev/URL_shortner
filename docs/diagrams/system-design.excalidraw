@@ -1,0 +1,11 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "https://excalidraw.com",
+  "elements": [
+    {"id":"sd-title","type":"text","x":40,"y":30,"width":360,"height":35,"angle":0,"strokeColor":"#111111","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"groupIds":[],"frameId":null,"roundness":null,"seed":101,"version":1,"versionNonce":101,"isDeleted":false,"boundElements":null,"updated":1,"link":null,"locked":false,"text":"System Design","fontSize":28,"fontFamily":1,"textAlign":"left","verticalAlign":"top","containerId":null,"originalText":"System Design","lineHeight":1.25,"baseline":28},
+    {"id":"sd-flow","type":"text","x":60,"y":100,"width":720,"height":220,"angle":0,"strokeColor":"#111111","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"groupIds":[],"frameId":null,"roundness":null,"seed":102,"version":1,"versionNonce":102,"isDeleted":false,"boundElements":null,"updated":1,"link":null,"locked":false,"text":"Client / Browser\n  -> Express API\n      -> Auth Middleware (JWT)\n      -> URL Validator\n      -> Prisma Client\n          -> PostgreSQL: User, Url, Click\n      -> Redis: redirect cache + rate limiter\n      -> BullMQ: analytics queue\n          -> Worker\n              -> PostgreSQL: Click writes","fontSize":22,"fontFamily":1,"textAlign":"left","verticalAlign":"top","containerId":null,"originalText":"Client / Browser\n  -> Express API\n      -> Auth Middleware (JWT)\n      -> URL Validator\n      -> Prisma Client\n          -> PostgreSQL: User, Url, Click\n      -> Redis: redirect cache + rate limiter\n      -> BullMQ: analytics queue\n          -> Worker\n              -> PostgreSQL: Click writes","lineHeight":1.25,"baseline":220}
+  ],
+  "appState": {"gridSize": null, "viewBackgroundColor": "#ffffff"},
+  "files": {}
+}

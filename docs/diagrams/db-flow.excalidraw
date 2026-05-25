@@ -1,0 +1,11 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "https://excalidraw.com",
+  "elements": [
+    {"id":"db-title","type":"text","x":40,"y":30,"width":360,"height":35,"angle":0,"strokeColor":"#111111","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"groupIds":[],"frameId":null,"roundness":null,"seed":301,"version":1,"versionNonce":301,"isDeleted":false,"boundElements":null,"updated":1,"link":null,"locked":false,"text":"Database Flow","fontSize":28,"fontFamily":1,"textAlign":"left","verticalAlign":"top","containerId":null,"originalText":"Database Flow","lineHeight":1.25,"baseline":28},
+    {"id":"db-flow","type":"text","x":60,"y":100,"width":760,"height":240,"angle":0,"strokeColor":"#111111","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"groupIds":[],"frameId":null,"roundness":null,"seed":302,"version":1,"versionNonce":302,"isDeleted":false,"boundElements":null,"updated":1,"link":null,"locked":false,"text":"User\n  id PK\n  email UNIQUE\n  password hash\n  -> Url.userId\n\nUrl\n  id PK\n  shortCode UNIQUE + index\n  originalUrl\n  expiresAt\n  -> Click.urlId\n\nClick\n  id PK\n  urlId index\n  ip\n  userAgent\n  timestamp","fontSize":22,"fontFamily":1,"textAlign":"left","verticalAlign":"top","containerId":null,"originalText":"User\n  id PK\n  email UNIQUE\n  password hash\n  -> Url.userId\n\nUrl\n  id PK\n  shortCode UNIQUE + index\n  originalUrl\n  expiresAt\n  -> Click.urlId\n\nClick\n  id PK\n  urlId index\n  ip\n  userAgent\n  timestamp","lineHeight":1.25,"baseline":240}
+  ],
+  "appState": {"gridSize": null, "viewBackgroundColor": "#ffffff"},
+  "files": {}
+}

@@ -1,0 +1,11 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "https://excalidraw.com",
+  "elements": [
+    {"id":"auth-title","type":"text","x":40,"y":30,"width":360,"height":35,"angle":0,"strokeColor":"#111111","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"groupIds":[],"frameId":null,"roundness":null,"seed":601,"version":1,"versionNonce":601,"isDeleted":false,"boundElements":null,"updated":1,"link":null,"locked":false,"text":"Auth Flow","fontSize":28,"fontFamily":1,"textAlign":"left","verticalAlign":"top","containerId":null,"originalText":"Auth Flow","lineHeight":1.25,"baseline":28},
+    {"id":"auth-flow","type":"text","x":60,"y":100,"width":760,"height":250,"angle":0,"strokeColor":"#111111","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"groupIds":[],"frameId":null,"roundness":null,"seed":602,"version":1,"versionNonce":602,"isDeleted":false,"boundElements":null,"updated":1,"link":null,"locked":false,"text":"Register\n  POST /auth/register\n  -> validate email/password\n  -> unique email lookup\n  -> bcrypt hash\n  -> User insert\n\nLogin\n  POST /auth/login\n  -> user lookup\n  -> bcrypt compare\n  -> JWT { userId }, expires 7d\n\nProtected routes\n  Authorization: Bearer token\n  -> jwt.verify\n  -> req.userId","fontSize":22,"fontFamily":1,"textAlign":"left","verticalAlign":"top","containerId":null,"originalText":"Register\n  POST /auth/register\n  -> validate email/password\n  -> unique email lookup\n  -> bcrypt hash\n  -> User insert\n\nLogin\n  POST /auth/login\n  -> user lookup\n  -> bcrypt compare\n  -> JWT { userId }, expires 7d\n\nProtected routes\n  Authorization: Bearer token\n  -> jwt.verify\n  -> req.userId","lineHeight":1.25,"baseline":250}
+  ],
+  "appState": {"gridSize": null, "viewBackgroundColor": "#ffffff"},
+  "files": {}
+}
